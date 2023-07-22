@@ -16,8 +16,8 @@ public class Test_DW {
         LocalDateTime start = LocalDateTime.now();
         System.out.println("Program Starts at: "+ DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS").format(start));
 
-//        RSMT rsmt = new RSMT("input_baseCases/case1/case1_I2C4_SCL", "result_baseCases/case1_I2C4_SCL");
-        RSMT rsmt = new RSMT("input_baseCases/case5/case5_I2C2_SCL", "result_baseCases/case5_I2C2_SCL");
+        RSMT rsmt = new RSMT("input_baseCases/case1/case1_I2C4_SCL", "result_baseCases/case1_I2C4_SCL");
+//        RSMT rsmt = new RSMT("input_baseCases/case5/case5_I2C2_SCL", "result_baseCases/case5_I2C2_SCL");
 
         LocalDateTime end = LocalDateTime.now();
         Duration duration = Duration.between(start,end);

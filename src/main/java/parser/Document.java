@@ -1,9 +1,6 @@
 package parser;
 
-import shapes.Keepout;
-import shapes.Master;
-import shapes.Path;
-import shapes.Slave;
+import shapes.*;
 
 import java.util.ArrayList;
 
@@ -15,11 +12,22 @@ public class Document {
 
     private ArrayList<Path> paths;
 
+    private ArrayList<Node> steinerPoints;
+
 
     public Document() {
         this.slaves = new ArrayList<>();
         this.keepouts = new ArrayList<>();
         this.paths = new ArrayList<>();
+        this.steinerPoints = new ArrayList<>();
+    }
+
+    public ArrayList<Node> getSteinerPoints() {
+        return steinerPoints;
+    }
+
+    public void setSteinerPoints(ArrayList<Node> steinerPoints) {
+        this.steinerPoints = steinerPoints;
     }
 
     public ArrayList<Path> getPaths() {

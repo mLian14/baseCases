@@ -21,6 +21,7 @@
 package shapes;
 
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -71,6 +72,8 @@ public class Point {
         this.y = y;
         this.degree = 0;
         this.canbeBypass = true;
+        this.pseudo_oDir_qs = new HashMap<>();
+        this.pseudo_oRel_qs = new HashMap<>();
     }
 
     public double getX() {

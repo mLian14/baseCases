@@ -7,9 +7,7 @@ import shapes.*;
 
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -66,6 +64,8 @@ public class OSMT {
          * We generate all nodes besides the terminals
          */
         octSteinerNodesGenerator(terminals, nodes, ms_node);
+
+        document.setSteinerPoints(nodes);
 
         /*ArrayList<Node> steiner_nodes = new ArrayList<>(nodes);
         steiner_nodes.removeAll(terminals);*/
@@ -345,29 +345,81 @@ public class OSMT {
 
 
         }
-
-        /*
-        Detect opposite relations between each path
-         */
-        ArrayList<Keepout> obstacles = document.getKeepouts();
-        ArrayList<Point> points = new ArrayList<>();
-        for (Path tmpPath : paths){
-            Point src = tmpPath.startPoint;
-            Point dest = tmpPath.endPoint;
-            if (!points.contains(src)){
-                points.add(src);
-            }
-            if (!points.contains(dest)){
-                points.add(dest);
-            }
+        //recompute the final wire length
+        int length = 0;
+        for (Path subpath : paths){
+            length += dist(subpath.startPoint, subpath.endPoint);
         }
-        for (Point point : points){
-            for (Keepout obstacle : obstacles){
-                basicBinaryVariables(point, obstacle);
-            }
-        }
+        System.out.println("withoutObstaclesLength= " + length);
+        document.setPaths(paths);
 
-
+//        /*
+//        Detect opposite relations between each path
+//         */
+//        ArrayList<Keepout> obstacles = document.getKeepouts();
+//        ArrayList<Point> points = new ArrayList<>();
+//        for (Path tmpPath : paths){
+//            Point src = tmpPath.startPoint;
+//            Point dest = tmpPath.endPoint;
+//            points.add(src);
+//            points.add(dest);
+//        }
+//        for (Point point : points){
+//            for (Keepout obstacle : obstacles){
+//                basicBinaryVariables(point, obstacle);
+//            }
+//        }
+//
+//
+//        ArrayList<Path> copy_path = new ArrayList<>(paths);
+//        for (Path targetPath : copy_path) {
+//            Point src = targetPath.startPoint;
+//            Point dest = targetPath.endPoint;
+//            for (Keepout obstacle : obstacles) {
+//                System.out.println(Arrays.toString(src.getPseudo_oRel_qs().get(obstacle)));
+//                //l->r || r->l || t->b || b->t
+//                //ul->lr || lr->ul || ur->ll || ll->ur
+//                if ((src.getPseudo_oRel_qs().get(obstacle)[4] + dest.getPseudo_oRel_qs().get(obstacle)[5] == 2) ||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[5] + dest.getPseudo_oRel_qs().get(obstacle)[4] == 2) ||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[6] + dest.getPseudo_oRel_qs().get(obstacle)[7] == 2) ||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[7] + dest.getPseudo_oRel_qs().get(obstacle)[6] == 2) ||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[0] + dest.getPseudo_oRel_qs().get(obstacle)[3] == 2) ||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[3] + dest.getPseudo_oRel_qs().get(obstacle)[0] == 2) ||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[1] + dest.getPseudo_oRel_qs().get(obstacle)[2] == 2) ||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[2] + dest.getPseudo_oRel_qs().get(obstacle)[1] == 2) ) {
+//
+//                    ArrayList<Double> detours = new ArrayList<>();
+//                    int minCnt = -1;
+//                    for (int c_cnt = 0; c_cnt < obstacle.corners.size(); ++c_cnt) {
+//                        Point corner = obstacle.corners.get(c_cnt);
+//                        if (!corner.canbeBypass) {
+//                            detours.add(Double.POSITIVE_INFINITY);
+//                        } else {
+//                            detours.add(dist(src, corner) + dist(corner, dest));
+//                        }
+//                        double minDetour = Collections.min(detours);
+//                        minCnt = detours.indexOf(minDetour);
+//                    }
+//                    Point bypassCorner = obstacle.corners.get(minCnt);
+//                    //delete and add
+//                    paths.remove(targetPath);
+//                    Path p1 = new Path(src, bypassCorner);
+//                    Path p2 = new Path(bypassCorner, dest);
+//                    paths.add(p1);
+//                    paths.add(p2);
+//
+//
+//                }
+//
+//            }
+//        }
+//
+//        //recompute the final wire length
+//        length = 0;
+//        for (Path subpath : paths){
+//            length += dist(subpath.startPoint, subpath.endPoint);
+//        }
+//        System.out.println("finalLength= " + length);
         document.setPaths(paths);
 
     }
@@ -430,7 +482,7 @@ public class OSMT {
             double x1 = set_copy.get(i).getX_exact();
             double y1 = set_copy.get(i).getY_exact();
             //System.out.println(tmpX);
-            for (int j = i + 1; j < set_copy.size(); ++j) {
+            for (int j = 0; j < set_copy.size(); ++j) {
                 if (j != i) {
                     double x2 = set_copy.get(j).getX_exact();
                     double y2 = set_copy.get(j).getY_exact();
@@ -445,10 +497,11 @@ public class OSMT {
 
 
                     Node[] steinNodes = new Node[4];
-                    if (deltaX < deltaY){
+                    if (deltaX >= deltaY){
                         steinNodes[0] = new Node(minx + deltaY, miny, NodeType.SteinerNode);
                         steinNodes[1] = new Node(maxx - deltaY, maxy, NodeType.SteinerNode);
-                    }else {
+                    }
+                    else {
                         steinNodes[0] = new Node(minx, miny + deltaX, NodeType.SteinerNode);
                         steinNodes[1] = new Node(maxx, maxy - deltaX, NodeType.SteinerNode);
                     }
@@ -457,7 +510,7 @@ public class OSMT {
                     steinNodes[3] = new Node(x2, y1, NodeType.SteinerNode);
 
                     for (Node steinNode : steinNodes) {
-                        if (!set_copy.contains(steinNode) || !nodes.contains(steinNode)) {
+                        if (!nodes.contains(steinNode)) {
                             steinNode.setNum(nodes.size() + 1);
                             nodes.add(steinNode);
                         } else {

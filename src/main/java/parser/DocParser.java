@@ -37,19 +37,6 @@ public class DocParser {
                     Point upperRight = new Point(o.getMaxX(), o.getMaxY());
                     o.corners = new ArrayList<>(Arrays.asList(lowerLeft, lowerRight, upperLeft, upperRight));
 
-                    if (Integer.parseInt(coordinates[4]) == 1){
-                        o.corners.get(0).canbeBypass = false;
-                    }
-                    if (Integer.parseInt(coordinates[5]) == 1){
-                        o.corners.get(1).canbeBypass = false;
-                    }
-                    if (Integer.parseInt(coordinates[6]) == 1){
-                        o.corners.get(2).canbeBypass = false;
-                    }
-                    if (Integer.parseInt(coordinates[7]) == 1){
-                        o.corners.get(3).canbeBypass = false;
-                    }
-
                     parseDoc.addToUni_keepouts(o);
                     i++;
                 }

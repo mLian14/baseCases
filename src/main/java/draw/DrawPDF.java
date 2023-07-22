@@ -36,6 +36,7 @@ public class DrawPDF {
         ArrayList<Keepout> uni_keepouts = outputDoc.getKeepouts();
         Master master = outputDoc.getMaster();
         ArrayList<Path> paths = outputDoc.getPaths();
+        ArrayList<Node> steinerPoints = outputDoc.getSteinerPoints();
         /*
         Process the PDFsize
          */
@@ -136,6 +137,8 @@ public class DrawPDF {
             document.add(pSV);
         }
 
+
+
         /*
         draw paths
          */
@@ -168,6 +171,18 @@ public class DrawPDF {
                 document.add(pSV);
 
             }
+        }
+
+        /*
+        draw steiner points
+         */
+        for (Node steiner : steinerPoints){
+            Color RED = convertRgbToCmyk(new DeviceRgb(255,0,0));
+            canvas.setColor(RED, true)
+                    .circle(steiner.getX(), steiner.getY(), 0.5 * sl_r)
+                    .fill()
+                    .stroke();
+
         }
 
 

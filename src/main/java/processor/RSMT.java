@@ -72,6 +72,7 @@ public class RSMT {
         int node_cnt = nodes.size();
         System.out.println("node_cnt" + node_cnt);
         System.out.println(nodes);
+        document.setSteinerPoints(nodes);
 
         /*
          * The Matrix d of shortest lengths
@@ -341,69 +342,73 @@ public class RSMT {
 
         }
 
-        /*
-        Detect opposite relations between each path
-         */
-        ArrayList<Keepout> obstacles = document.getKeepouts();
-        ArrayList<Point> points = new ArrayList<>();
-        for (Path tmpPath : paths){
-            Point src = tmpPath.startPoint;
-            Point dest = tmpPath.endPoint;
-            if (!points.contains(src)){
-                points.add(src);
-            }
-            if (!points.contains(dest)){
-                points.add(dest);
-            }
+//        /*
+//        Detect opposite relations between each path
+//         */
+//        ArrayList<Keepout> obstacles = document.getKeepouts();
+//        ArrayList<Point> points = new ArrayList<>();
+//        for (Path tmpPath : paths){
+//            Point src = tmpPath.startPoint;
+//            Point dest = tmpPath.endPoint;
+//            if (!points.contains(src)){
+//                points.add(src);
+//            }
+//            if (!points.contains(dest)){
+//                points.add(dest);
+//            }
+//        }
+//        for (Point point : points){
+//            for (Keepout obstacle : obstacles){
+//                basicBinaryVariables(point, obstacle);
+//            }
+//        }
+//        ArrayList<Path> copy_path = new ArrayList<>(paths);
+//        for (Path targetPath : copy_path){
+//            Point src = targetPath.startPoint;
+//            Point dest = targetPath.endPoint;
+//            for (Keepout obstacle : obstacles){
+//                //l->r || r->l || t->b || b->t
+//                if ((src.getPseudo_oRel_qs().get(obstacle)[4] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[5] == 1) ||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[5] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[4] == 1)||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[6] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[7] == 1)||
+//                        (src.getPseudo_oRel_qs().get(obstacle)[7] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[6] == 1)){
+//
+//                    ArrayList<Double> detours = new ArrayList<>();
+//                    int minCnt = -1;
+//                    for (int c_cnt = 0; c_cnt < obstacle.corners.size(); ++c_cnt){
+//                        Point corner = obstacle.corners.get(c_cnt);
+//                        if (!corner.canbeBypass){
+//                            detours.add(Double.POSITIVE_INFINITY);
+//                        }
+//                        else {
+//                            detours.add(dist(src, corner) + dist(corner, dest));
+//                        }
+//                        double minDetour = Collections.min(detours);
+//                        minCnt = detours.indexOf(minDetour);
+//                    }
+//                    Point bypassCorner = obstacle.corners.get(minCnt);
+//                    //delete and add
+//                    paths.remove(targetPath);
+//                    Path p1 = new Path(src, bypassCorner);
+//                    Path p2 = new Path(bypassCorner, dest);
+//                    paths.add(p1);
+//                    paths.add(p2);
+//
+//
+//
+//                }
+//
+//            }
+//
+//
+//        }
+//
+        //recompute the final wire length
+        int length = 0;
+        for (Path subpath : paths){
+            length += dist(subpath.startPoint, subpath.endPoint);
         }
-        for (Point point : points){
-            for (Keepout obstacle : obstacles){
-                basicBinaryVariables(point, obstacle);
-            }
-        }
-        ArrayList<Path> copy_path = new ArrayList<>(paths);
-        for (Path targetPath : copy_path){
-            Point src = targetPath.startPoint;
-            Point dest = targetPath.endPoint;
-            for (Keepout obstacle : obstacles){
-                //l->r || r->l
-                if ((src.getPseudo_oRel_qs().get(obstacle)[4] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[5] == 1) ||
-                        (src.getPseudo_oRel_qs().get(obstacle)[5] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[4] == 1)||
-                        (src.getPseudo_oRel_qs().get(obstacle)[6] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[7] == 1)||
-                        (src.getPseudo_oRel_qs().get(obstacle)[7] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[6] == 1)){
-
-                    ArrayList<Double> detours = new ArrayList<>();
-                    int minCnt = -1;
-                    for (int c_cnt = 0; c_cnt < obstacle.corners.size(); ++c_cnt){
-                        Point corner = obstacle.corners.get(c_cnt);
-                        if (!corner.canbeBypass){
-                            detours.add(Double.POSITIVE_INFINITY);
-                        }
-                        else {
-                            detours.add(dist(src, corner) + dist(corner, dest));
-                        }
-                        double minDetour = Collections.min(detours);
-                        minCnt = detours.indexOf(minDetour);
-                    }
-                    Point bypassCorner = obstacle.corners.get(minCnt);
-                    //delete and add
-                    paths.remove(targetPath);
-                    Path p1 = new Path(src, bypassCorner);
-                    Path p2 = new Path(bypassCorner, dest);
-                    paths.add(p1);
-                    paths.add(p2);
-
-
-
-                }
-
-            }
-
-
-        }
-
-
-
+        System.out.println("withoutObstaclesLength= " + length);
 
 
 

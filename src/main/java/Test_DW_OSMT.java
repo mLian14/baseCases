@@ -18,6 +18,8 @@ public class Test_DW_OSMT {
 //        OSMT osmt = new OSMT("input_baseCases/case5/case5_I2C2_SCL", "result_baseCases/OMST/case5_I2C2_SCL");
 
         OSMT osmt = new OSMT("input_baseCases/case1/case1_I2C4_SCL", "result_baseCases/OMST/case1_I2C4_SCL");
+//        OSMT osmt = new OSMT("input_baseCases/test", "result_baseCases/test");
+
 
         LocalDateTime end = LocalDateTime.now();
         Duration duration = Duration.between(start,end);

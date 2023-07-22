@@ -12,7 +12,7 @@ public class Keepout extends Shape{
 
     private int minX, maxX, minY, maxY;
 
-    public ArrayList<Point> corners;
+    public ArrayList<Point> corners;//lowerLeft, lowerRight, upperLeft, upperRight
 
     private final ArrayList<Keepout> left_os, right_os, above_os, below_os;
 
