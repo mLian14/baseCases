@@ -173,17 +173,17 @@ public class DrawPDF {
             }
         }
 
-        /*
-        draw steiner points
-         */
-        for (Node steiner : steinerPoints){
-            Color RED = convertRgbToCmyk(new DeviceRgb(255,0,0));
-            canvas.setColor(RED, true)
-                    .circle(steiner.getX(), steiner.getY(), 0.5 * sl_r)
-                    .fill()
-                    .stroke();
-
-        }
+//        /*
+//        draw steiner points
+//         */
+//        for (Node steiner : steinerPoints){
+//            Color RED = convertRgbToCmyk(new DeviceRgb(255,0,0));
+//            canvas.setColor(RED, true)
+//                    .circle(steiner.getX(), steiner.getY(), 0.5 * sl_r)
+//                    .fill()
+//                    .stroke();
+//
+//        }
 
 
 
