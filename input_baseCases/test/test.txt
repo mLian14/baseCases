@@ -1,0 +1,12 @@
+Uni_Keepouts
+FIN
+Master
+U300.BF33 0 0
+Slave
+s1 1 1
+s2 2 2
+s3 3 3
+s4 4 4
+FIN
+slaveC 1
+busC 1
