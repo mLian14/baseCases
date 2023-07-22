@@ -72,7 +72,6 @@ public class RSMT {
         int node_cnt = nodes.size();
         System.out.println("node_cnt" + node_cnt);
         System.out.println(nodes);
-        document.setSteinerPoints(nodes);
 
         /*
          * The Matrix d of shortest lengths
@@ -342,73 +341,12 @@ public class RSMT {
 
         }
 
-//        /*
-//        Detect opposite relations between each path
-//         */
-//        ArrayList<Keepout> obstacles = document.getKeepouts();
-//        ArrayList<Point> points = new ArrayList<>();
-//        for (Path tmpPath : paths){
-//            Point src = tmpPath.startPoint;
-//            Point dest = tmpPath.endPoint;
-//            if (!points.contains(src)){
-//                points.add(src);
-//            }
-//            if (!points.contains(dest)){
-//                points.add(dest);
-//            }
-//        }
-//        for (Point point : points){
-//            for (Keepout obstacle : obstacles){
-//                basicBinaryVariables(point, obstacle);
-//            }
-//        }
-//        ArrayList<Path> copy_path = new ArrayList<>(paths);
-//        for (Path targetPath : copy_path){
-//            Point src = targetPath.startPoint;
-//            Point dest = targetPath.endPoint;
-//            for (Keepout obstacle : obstacles){
-//                //l->r || r->l || t->b || b->t
-//                if ((src.getPseudo_oRel_qs().get(obstacle)[4] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[5] == 1) ||
-//                        (src.getPseudo_oRel_qs().get(obstacle)[5] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[4] == 1)||
-//                        (src.getPseudo_oRel_qs().get(obstacle)[6] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[7] == 1)||
-//                        (src.getPseudo_oRel_qs().get(obstacle)[7] == 1 && dest.getPseudo_oRel_qs().get(obstacle)[6] == 1)){
-//
-//                    ArrayList<Double> detours = new ArrayList<>();
-//                    int minCnt = -1;
-//                    for (int c_cnt = 0; c_cnt < obstacle.corners.size(); ++c_cnt){
-//                        Point corner = obstacle.corners.get(c_cnt);
-//                        if (!corner.canbeBypass){
-//                            detours.add(Double.POSITIVE_INFINITY);
-//                        }
-//                        else {
-//                            detours.add(dist(src, corner) + dist(corner, dest));
-//                        }
-//                        double minDetour = Collections.min(detours);
-//                        minCnt = detours.indexOf(minDetour);
-//                    }
-//                    Point bypassCorner = obstacle.corners.get(minCnt);
-//                    //delete and add
-//                    paths.remove(targetPath);
-//                    Path p1 = new Path(src, bypassCorner);
-//                    Path p2 = new Path(bypassCorner, dest);
-//                    paths.add(p1);
-//                    paths.add(p2);
-//
-//
-//
-//                }
-//
-//            }
-//
-//
-//        }
-//
-        //recompute the final wire length
+
         int length = 0;
         for (Path subpath : paths){
             length += dist(subpath.startPoint, subpath.endPoint);
         }
-        System.out.println("withoutObstaclesLength= " + length);
+        System.out.println("finalLength= " + length);
 
 
 
@@ -530,97 +468,6 @@ public class RSMT {
             }
         }
         return false;
-    }
-
-    private void basicBinaryVariables(Point base, Keepout o) {
-
-        /*
-        oDir_q: UL, UR, LR, LL, L, R, T, B
-         */
-        int[] odir_q = new int[8];
-        //UL
-        if (base.getY() < base.getX() + o.getMaxY() - o.getMinX()) {
-            odir_q[0] = 0;
-        } else
-            odir_q[0] = 1;
-        //UR
-        if (base.getY() <= -base.getX() + o.getMaxY() + o.getMaxX()) {
-            odir_q[1] = 0;
-        } else
-            odir_q[1] = 1;
-        //LR
-        if (base.getY() <= base.getX() + o.getMinY() - o.getMaxX()) {
-            odir_q[2] = 1;
-        } else
-            odir_q[2] = 0;
-        //LL
-        if (base.getY() < -base.getX() + o.getMinY() + o.getMinX()) {
-            odir_q[3] = 1;
-        } else
-            odir_q[3] = 0;
-        //L
-        if (base.getX() < o.getMinX()) {
-            odir_q[4] = 0;
-        } else
-            odir_q[4] = 1;
-        //R
-        if (base.getX() > o.getMaxX()) {
-            odir_q[5] = 0;
-        } else
-            odir_q[5] = 1;
-        //T
-        if (base.getY() > o.getMaxY()) {
-            odir_q[6] = 0;
-        } else
-            odir_q[6] = 1;
-        //B
-        if (base.getY() < o.getMinY()) {
-            odir_q[7] = 0;
-        } else
-            odir_q[7] = 1;
-        base.addToPseudo_oDir_qs(o, odir_q);
-
-        /*
-        oRel_q:
-         */
-        int[] orel_q = new int[8];
-        //UpperLeft
-        if (odir_q[3] + odir_q[1] + odir_q[4] * odir_q[6] == 0) {
-            orel_q[0] = 1;
-        } else orel_q[0] = 0;
-        //UpperRight
-        if (odir_q[0] + odir_q[2] + odir_q[5] * odir_q[6] == 0) {
-            orel_q[1] = 1;
-        } else orel_q[1] = 0;
-        //LowerLeft
-        if (odir_q[0] + odir_q[2] + odir_q[4] * odir_q[7] == 0) {
-            orel_q[2] = 1;
-        } else orel_q[2] = 0;
-        //LowerRight
-        if (odir_q[1] + odir_q[3] + odir_q[5] * odir_q[7] == 0) {
-            orel_q[3] = 1;
-        } else orel_q[3] = 0;
-
-        //d_Left
-        if (odir_q[5] + odir_q[6] + odir_q[7] == 3) {
-            orel_q[4] = 1;
-        } else orel_q[4] = 0;
-        //d_Right
-        if (odir_q[4] + odir_q[6] + odir_q[7] == 3) {
-            orel_q[5] = 1;
-        } else orel_q[5] = 0;
-        //d_Top
-        if (odir_q[4] + odir_q[5] + odir_q[7] == 3) {
-            orel_q[6] = 1;
-        } else orel_q[6] = 0;
-        //d_Bottom
-        if (odir_q[4] + odir_q[5] + odir_q[6] == 3) {
-            orel_q[7] = 1;
-        } else orel_q[7] = 0;
-
-
-        base.addToPseudo_oRel_qs(o, orel_q);
-
     }
 
 }
